@@ -43,32 +43,34 @@ config = {
         "ENABLED_PAYMENT_PROCESSORS": ["cybersource", "paypal"],
         "ENABLED_CLIENT_SIDE_PAYMENT_PROCESSORS": ["cybersource"],
         "EXTRA_PAYMENT_PROCESSOR_CLASSES": [],
+        "EXTRA_PAYMENT_PROCESSOR_URLS": {},
     },
     "defaults": {
         "VERSION": __version__,
-        "DOCKER_IMAGE": "overhangio/openedx-ecommerce:{{ ECOMMERCE_VERSION }}",
-        "WORKER_DOCKER_IMAGE": "overhangio/openedx-ecommerce-worker:{{ ECOMMERCE_VERSION }}",
+        "DOCKER_IMAGE": "{{ DOCKER_REGISTRY }}overhangio/openedx-ecommerce:{{ ECOMMERCE_VERSION }}",
+        "WORKER_DOCKER_IMAGE": "{{ DOCKER_REGISTRY }}overhangio/openedx-ecommerce-worker:{{ ECOMMERCE_VERSION }}",
         "HOST": "ecommerce.{{ LMS_HOST }}",
         "MYSQL_DATABASE": "ecommerce",
         "MYSQL_USERNAME": "ecommerce",
+        "CURRENCY": "USD",
         "OAUTH2_KEY": "ecommerce",
         "OAUTH2_KEY_DEV": "ecommerce-dev",
         "OAUTH2_KEY_SSO": "ecommerce-sso",
         "OAUTH2_KEY_SSO_DEV": "ecommerce-sso-dev",
         "API_TIMEOUT": 5,
-        "WORKER_JWT_ISSUER": "ecommerce-worker",# TODO do we need to keep this?
+        "WORKER_JWT_ISSUER": "ecommerce-worker",  # TODO do we need to keep this?
         "EXTRA_PIP_REQUIREMENTS": [],
     },
 }
 
 hooks = {
     "build-image": {
-        "ecommerce": "{{ DOCKER_REGISTRY }}{{ ECOMMERCE_DOCKER_IMAGE }}",
-        "ecommerce-worker": "{{ DOCKER_REGISTRY }}{{ ECOMMERCE_WORKER_DOCKER_IMAGE }}",
+        "ecommerce": "{{ ECOMMERCE_DOCKER_IMAGE }}",
+        "ecommerce-worker": "{{ ECOMMERCE_WORKER_DOCKER_IMAGE }}",
     },
     "remote-image": {
-        "ecommerce": "{{ DOCKER_REGISTRY }}{{ ECOMMERCE_DOCKER_IMAGE }}",
-        "ecommerce-worker": "{{ DOCKER_REGISTRY }}{{ ECOMMERCE_WORKER_DOCKER_IMAGE }}",
+        "ecommerce": "{{ ECOMMERCE_DOCKER_IMAGE }}",
+        "ecommerce-worker": "{{ ECOMMERCE_WORKER_DOCKER_IMAGE }}",
     },
     "init": ["mysql", "lms", "ecommerce"],
 }

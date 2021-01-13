@@ -6,7 +6,9 @@ ALLOWED_HOSTS = [
     "ecommerce",
 ]
 PLATFORM_NAME = "{{ PLATFORM_NAME }}"
-PROTOCOL = "{% if ACTIVATE_HTTPS %}https{% else %}http{% endif %}"
+PROTOCOL = "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}"
+
+OSCAR_DEFAULT_CURRENCY = "{{ ECOMMERCE_CURRENCY }}"
 
 EDX_API_KEY = "{{ ECOMMERCE_API_KEY }}"
 {% set jwt_rsa_key = rsa_import_key(JWT_RSA_PRIVATE_KEY) %}
@@ -33,15 +35,15 @@ JWT_AUTH["JWT_ISSUERS"] = [
     }
 ]
 
-SOCIAL_AUTH_REDIRECT_IS_HTTPS = {% if ACTIVATE_HTTPS %}True{% else %}False{% endif %}
-SOCIAL_AUTH_EDX_OAUTH2_ISSUER = "{% if ACTIVATE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}"
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = {% if ENABLE_HTTPS %}True{% else %}False{% endif %}
+SOCIAL_AUTH_EDX_OAUTH2_ISSUER = "{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}"
 SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = "http://lms:8000"
 
 BACKEND_SERVICE_EDX_OAUTH2_SECRET = "{{ ECOMMERCE_OAUTH2_SECRET }}"
 BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://lms:8000/oauth2"
 
 EDX_DRF_EXTENSIONS = {
-    'OAUTH2_USER_INFO_URL': '{% if ACTIVATE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2/user_info',
+    'OAUTH2_USER_INFO_URL': '{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/oauth2/user_info',
 }
 
 DATABASES = {
@@ -65,7 +67,7 @@ EMAIL_HOST_USER = "{{ SMTP_USERNAME }}"
 EMAIL_HOST_PASSWORD = "{{ SMTP_PASSWORD }}"
 EMAIL_USE_TLS = {{SMTP_USE_TLS}}
 
-ENTERPRISE_SERVICE_URL = '{% if ACTIVATE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/enterprise/'
+ENTERPRISE_SERVICE_URL = '{% if ENABLE_HTTPS %}https{% else %}http{% endif %}://{{ LMS_HOST }}/enterprise/'
 ENTERPRISE_API_URL = urljoin(ENTERPRISE_SERVICE_URL, 'api/v1/')
 
 LOGGING["handlers"]["local"] = {
@@ -79,3 +81,7 @@ PAYMENT_PROCESSOR_CONFIG = {
 }
 PAYMENT_PROCESSOR_CONFIG["dev"] = PAYMENT_PROCESSOR_CONFIG["openedx"]
 PAYMENT_PROCESSORS = list(PAYMENT_PROCESSORS) + {{ ECOMMERCE_EXTRA_PAYMENT_PROCESSOR_CLASSES }}
+
+{% for payment_processor, urls_module in ECOMMERCE_EXTRA_PAYMENT_PROCESSOR_URLS.items() %}
+EXTRA_PAYMENT_PROCESSOR_URLS["{{ payment_processor }}"] = "{{ urls_module }}"
+{% endfor %}
